@@ -15,7 +15,8 @@
       footprint: [[0.1, 0.1], [-0.1, 0.1], [-0.1, -0.1], [0.1, -0.1]]
     </rosparam>
 
-    <rosparam ns="xmlrpc_fail"> <!-- Footprint includes a 3-value point, which should make it fail. -->
+    <rosparam ns="xmlrpc_fail">
+      <!-- Footprint includes a 3-value point, which should make it fail. -->
       footprint_padding: 0
       footprint: [[0.1, 0.1], [-0.1, 0.1, 77.0], [-0.1, -0.1], [0.1, -0.1]]
     </rosparam>

@@ -43,7 +43,6 @@
 
 using namespace costmap_2d;
 
-
 /**
  * Tests the reset method
  *
@@ -322,8 +321,8 @@ TEST(costmap, testStaticMap){
 
 //*/
 
-
-int main(int argc, char** argv){
+int main(int argc, char **argv)
+{
   ros::init(argc, argv, "obstacle_tests");
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

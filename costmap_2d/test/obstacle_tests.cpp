@@ -70,20 +70,21 @@ using namespace costmap_2d;
 /**
  * Test for ray tracing free space
  */
-TEST(costmap, testRaytracing){
+TEST(costmap, testRaytracing)
+{
   tf2_ros::Buffer tf;
 
-  LayeredCostmap layers("frame", false, false);  // Not rolling window, not tracking unknown
-  addStaticLayer(layers, tf);  // This adds the static map
-  ObstacleLayer* olayer = addObstacleLayer(layers, tf);
-  
+  LayeredCostmap layers("frame", false, false); // Not rolling window, not tracking unknown
+  addStaticLayer(layers, tf);                   // This adds the static map
+  ObstacleLayer *olayer = addObstacleLayer(layers, tf);
+
   // Add a point at 0, 0, 0
-  addObservation(olayer, 0.0, 0.0, MAX_Z/2, 0, 0, MAX_Z/2);
+  addObservation(olayer, 0.0, 0.0, MAX_Z / 2, 0, 0, MAX_Z / 2);
 
   // This actually puts the LETHAL (254) point in the costmap at (0,0)
-  layers.updateMap(0,0,0);  // 0, 0, 0 is robot pose
+  layers.updateMap(0, 0, 0); // 0, 0, 0 is robot pose
   //printMap(*(layers.getCostmap()));
-  
+
   int lethal_count = countValues(*(layers.getCostmap()), LETHAL_OBSTACLE);
 
   // We expect just one obstacle to be added (20 in static map)
@@ -93,17 +94,18 @@ TEST(costmap, testRaytracing){
 /**
  * Test for ray tracing free space
  */
-TEST(costmap, testRaytracing2){
+TEST(costmap, testRaytracing2)
+{
   tf2_ros::Buffer tf;
   LayeredCostmap layers("frame", false, false);
   addStaticLayer(layers, tf);
-  ObstacleLayer* olayer = addObstacleLayer(layers, tf);
+  ObstacleLayer *olayer = addObstacleLayer(layers, tf);
 
   //If we print map now, it is 10x10 all value 0
   //printMap(*(layers.getCostmap()));
 
   // Update will fill in the costmap with the static map
-  layers.updateMap(0,0,0);
+  layers.updateMap(0, 0, 0);
 
   //If we print the map now, we get the static map
   //printMap(*(layers.getCostmap()));
@@ -115,7 +117,7 @@ TEST(costmap, testRaytracing2){
   // The sensor origin will be <0,0>. So if we add an obstacle at 9,9,
   // we would expect cells <0, 0> thru <8, 8> to be traced through
   // however the static map is not cleared by obstacle layer
-  addObservation(olayer, 9.5, 9.5, MAX_Z/2, 0.5, 0.5, MAX_Z/2);
+  addObservation(olayer, 9.5, 9.5, MAX_Z / 2, 0.5, 0.5, MAX_Z / 2);
   layers.updateMap(0, 0, 0);
 
   // If we print map now, we have static map + <9,9> is LETHAL
@@ -124,11 +126,11 @@ TEST(costmap, testRaytracing2){
 
   // Change from previous test:
   // No obstacles from the static map will be cleared, so the
-  // net change is +1. 
+  // net change is +1.
   ASSERT_EQ(obs_after, obs_before + 1);
 
   // Fill in the diagonal, <7,7> and <9,9> already filled in, <0,0> is robot
-  for(int i = 0; i < olayer->getSizeInCellsY(); ++i)
+  for (int i = 0; i < olayer->getSizeInCellsY(); ++i)
   {
     olayer->setCost(i, i, LETHAL_OBSTACLE);
   }
@@ -149,13 +151,14 @@ TEST(costmap, testRaytracing2){
 /**
  * Test for wave interference
  */
-TEST(costmap, testWaveInterference){
+TEST(costmap, testWaveInterference)
+{
   tf2_ros::Buffer tf;
 
   // Start with an empty map, no rolling window, tracking unknown
   LayeredCostmap layers("frame", false, true);
   layers.resizeMap(10, 10, 1, 0, 0);
-  ObstacleLayer* olayer = addObstacleLayer(layers, tf);
+  ObstacleLayer *olayer = addObstacleLayer(layers, tf);
 
   // If we print map now, it is 10x10, all cells are 255 (NO_INFORMATION)
   //printMap(*(layers.getCostmap()));
@@ -164,9 +167,9 @@ TEST(costmap, testWaveInterference){
   addObservation(olayer, 3.0, 3.0, MAX_Z);
   addObservation(olayer, 5.0, 5.0, MAX_Z);
   addObservation(olayer, 7.0, 7.0, MAX_Z);
-  layers.updateMap(0,0,0);
+  layers.updateMap(0, 0, 0);
 
-  Costmap2D* costmap = layers.getCostmap();
+  Costmap2D *costmap = layers.getCostmap();
   // 3 obstacle cells are filled, <1,1>,<2,2>,<4,4> and <6,6> are now free
   // <0,0> is footprint and is free
   //printMap(*costmap);
@@ -178,43 +181,44 @@ TEST(costmap, testWaveInterference){
 /**
  * Make sure we ignore points outside of our z threshold
  */
-TEST(costmap, testZThreshold){
+TEST(costmap, testZThreshold)
+{
   tf2_ros::Buffer tf;
   // Start with an empty map
   LayeredCostmap layers("frame", false, true);
   layers.resizeMap(10, 10, 1, 0, 0);
 
-  ObstacleLayer* olayer = addObstacleLayer(layers, tf);
+  ObstacleLayer *olayer = addObstacleLayer(layers, tf);
 
   // A point cloud with 2 points falling in a cell with a non-lethal cost
   addObservation(olayer, 0.0, 5.0, 0.4);
   addObservation(olayer, 1.0, 5.0, 2.2);
 
-  layers.updateMap(0,0,0);
+  layers.updateMap(0, 0, 0);
 
-  Costmap2D* costmap = layers.getCostmap();
+  Costmap2D *costmap = layers.getCostmap();
   ASSERT_EQ(countValues(*costmap, costmap_2d::LETHAL_OBSTACLE), 1);
 }
-
 
 /**
  * Verify that dynamic obstacles are added
  */
-TEST(costmap, testDynamicObstacles){
+TEST(costmap, testDynamicObstacles)
+{
   tf2_ros::Buffer tf;
   LayeredCostmap layers("frame", false, false);
   addStaticLayer(layers, tf);
 
-  ObstacleLayer* olayer = addObstacleLayer(layers, tf);
+  ObstacleLayer *olayer = addObstacleLayer(layers, tf);
 
   // Add a point cloud and verify its insertion. There should be only one new one
   addObservation(olayer, 0.0, 0.0);
   addObservation(olayer, 0.0, 0.0);
   addObservation(olayer, 0.0, 0.0);
 
-  layers.updateMap(0,0,0);
+  layers.updateMap(0, 0, 0);
 
-  Costmap2D* costmap = layers.getCostmap();
+  Costmap2D *costmap = layers.getCostmap();
   // Should now have 1 insertion and no deletions
   ASSERT_EQ(countValues(*costmap, costmap_2d::LETHAL_OBSTACLE), 21);
 
@@ -222,29 +226,28 @@ TEST(costmap, testDynamicObstacles){
   ASSERT_EQ(countValues(*costmap, costmap_2d::LETHAL_OBSTACLE), 21);
 }
 
-
 /**
  * Verify that if we add a point that is already a static obstacle we do not end up with a new ostacle
  */
-TEST(costmap, testMultipleAdditions){
+TEST(costmap, testMultipleAdditions)
+{
   tf2_ros::Buffer tf;
   LayeredCostmap layers("frame", false, false);
   addStaticLayer(layers, tf);
 
-  ObstacleLayer* olayer = addObstacleLayer(layers, tf);
+  ObstacleLayer *olayer = addObstacleLayer(layers, tf);
 
   // A point cloud with one point that falls within an existing obstacle
   addObservation(olayer, 9.5, 0.0);
-  layers.updateMap(0,0,0);
-  Costmap2D* costmap = layers.getCostmap();
+  layers.updateMap(0, 0, 0);
+  Costmap2D *costmap = layers.getCostmap();
   //printMap(*costmap);
 
   ASSERT_EQ(countValues(*costmap, costmap_2d::LETHAL_OBSTACLE), 20);
-
 }
 
-
-int main(int argc, char** argv){
+int main(int argc, char **argv)
+{
   ros::init(argc, argv, "obstacle_tests");
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

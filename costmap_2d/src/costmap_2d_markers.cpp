@@ -57,7 +57,7 @@ float g_colors_a[] = {0.0f, 0.5f, 1.0f};
 
 std::string g_marker_ns;
 V_Cell g_cells;
-void voxelCallback(const ros::Publisher& pub, const costmap_2d::VoxelGridConstPtr& grid)
+void voxelCallback(const ros::Publisher &pub, const costmap_2d::VoxelGridConstPtr &grid)
 {
   if (grid->data.empty())
   {
@@ -70,7 +70,7 @@ void voxelCallback(const ros::Publisher& pub, const costmap_2d::VoxelGridConstPt
   ROS_DEBUG("Received voxel grid");
   const std::string frame_id = grid->header.frame_id;
   const ros::Time stamp = grid->header.stamp;
-  const uint32_t* data = &grid->data.front();
+  const uint32_t *data = &grid->data.front();
   const double x_origin = grid->origin.x;
   const double y_origin = grid->origin.y;
   const double z_origin = grid->origin.z;
@@ -125,8 +125,8 @@ void voxelCallback(const ros::Publisher& pub, const costmap_2d::VoxelGridConstPt
   m.points.resize(num_markers);
   for (uint32_t i = 0; i < num_markers; ++i)
   {
-    Cell& c = g_cells[i];
-    geometry_msgs::Point& p = m.points[i];
+    Cell &c = g_cells[i];
+    geometry_msgs::Point &p = m.points[i];
     p.x = c.x;
     p.y = c.y;
     p.z = c.z;
@@ -138,15 +138,15 @@ void voxelCallback(const ros::Publisher& pub, const costmap_2d::VoxelGridConstPt
   ROS_DEBUG("Published %d markers in %f seconds", num_markers, (end - start).toSec());
 }
 
-int main(int argc, char** argv)
+int main(int argc, char **argv)
 {
   ros::init(argc, argv, "costmap_2d_markers");
   ros::NodeHandle n;
 
   ROS_DEBUG("Startup");
 
-  ros::Publisher pub = n.advertise < visualization_msgs::Marker > ("visualization_marker", 1);
-  ros::Subscriber sub = n.subscribe < costmap_2d::VoxelGrid > ("voxel_grid", 1, boost::bind(voxelCallback, pub, _1));
+  ros::Publisher pub = n.advertise<visualization_msgs::Marker>("visualization_marker", 1);
+  ros::Subscriber sub = n.subscribe<costmap_2d::VoxelGrid>("voxel_grid", 1, boost::bind(voxelCallback, pub, _1));
   g_marker_ns = n.resolveName("voxel_grid");
 
   ros::spin();
