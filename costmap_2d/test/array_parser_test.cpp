@@ -27,14 +27,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <gtest/gtest.h>
-
 #include "costmap_2d/array_parser.h"
+
+#include <gtest/gtest.h>
 
 using namespace costmap_2d;
 
-TEST(array_parser, basic_operation)
-{
+TEST(array_parser, basic_operation) {
   std::string error;
   std::vector<std::vector<float>> vvf;
   vvf = parseVVF("[[1, 2.2], [.3, -4e4]]", error);
@@ -48,32 +47,28 @@ TEST(array_parser, basic_operation)
   EXPECT_EQ("", error);
 }
 
-TEST(array_parser, missing_open)
-{
+TEST(array_parser, missing_open) {
   std::string error;
   std::vector<std::vector<float>> vvf;
   vvf = parseVVF("[1, 2.2], [.3, -4e4]]", error);
   EXPECT_FALSE(error == "");
 }
 
-TEST(array_parser, missing_close)
-{
+TEST(array_parser, missing_close) {
   std::string error;
   std::vector<std::vector<float>> vvf;
   vvf = parseVVF("[[1, 2.2], [.3, -4e4]", error);
   EXPECT_FALSE(error == "");
 }
 
-TEST(array_parser, wrong_depth)
-{
+TEST(array_parser, wrong_depth) {
   std::string error;
   std::vector<std::vector<float>> vvf;
   vvf = parseVVF("[1, 2.2], [.3, -4e4]", error);
   EXPECT_FALSE(error == "");
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
